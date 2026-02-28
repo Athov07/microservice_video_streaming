@@ -40,3 +40,46 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+
+
+
+const axios = require("axios");
+
+exports.getMyVideos = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    if (!userId) {
+      return res.status(400).json({ message: "User ID missing" });
+    }
+
+    const response = await fetch(
+      `${process.env.VIDEO_SERVICE_URL}/api/videos/user/${userId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error("Video Service Error:", errorData);
+      return res.status(response.status).json({
+        message: "Video service error",
+      });
+    }
+
+    const data = await response.json();
+
+    return res.status(200).json(data);
+
+  } catch (error) {
+    console.error("Internal Fetch Error:", error.message);
+    return res.status(500).json({
+      message: "Failed to fetch videos",
+    });
+  }
+};

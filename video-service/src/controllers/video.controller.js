@@ -81,3 +81,20 @@ exports.createVideo = async (req, res) => {
   }
 };
 
+
+
+exports.getVideosByUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const [rows] = await pool.execute(
+      "SELECT video_id, title, category, visibility, duration, video_url, created_at FROM videos WHERE user_id = ?",
+      [userId]
+    );
+
+    res.json(rows);
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

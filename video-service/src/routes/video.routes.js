@@ -11,4 +11,6 @@ router.post(
   videoController.createVideo
 );
 
+router.get("/user/:userId", videoController.getVideosByUser);
+
 module.exports = router;
