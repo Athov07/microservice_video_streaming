@@ -13,7 +13,7 @@ exports.createVideo = async (req, res) => {
       return res.status(400).json({ message: "Video file required" });
     }
 
-    // ✅ Get userId from JWT middleware
+    // Get userId from JWT middleware
     const userId = req.user.id; // make sure JWT payload contains "id"
 
     const videoId = uuidv4();
@@ -37,7 +37,7 @@ exports.createVideo = async (req, res) => {
     const videoUrl = uploadResult.secure_url;
     const duration = uploadResult.duration || 0;
 
-    // ✅ Store in MySQL
+    // Store in MySQL
     await pool.execute(
       `INSERT INTO videos 
        (video_id, user_id, title, category, visibility, duration, video_url) 
@@ -45,7 +45,7 @@ exports.createVideo = async (req, res) => {
       [videoId, userId, title, category, visibility, duration, videoUrl]
     );
 
-    // ✅ Publish Kafka Event
+    // Publish Kafka Event
     await producer.send({
       topic: "video-events",
       messages: [
@@ -62,7 +62,7 @@ exports.createVideo = async (req, res) => {
       ],
     });
 
-    // ✅ Store metadata in MongoDB
+    // Store metadata in MongoDB
     await VideoMeta.create({
       videoId,
       description,
@@ -80,3 +80,4 @@ exports.createVideo = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
